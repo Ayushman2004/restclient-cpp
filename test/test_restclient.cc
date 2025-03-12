@@ -253,3 +253,36 @@ TEST_F(RestClientTest, TestRestClientHeadCode)
   EXPECT_EQ(200, res.code);
   EXPECT_EQ("", res.body);
 }
+
+// check for header map case-insensitivity 
+TEST_F(RestClientTest, TestHeaderCaseInsensitivity)
+{
+    RestClient::Response res = RestClient::get("https://httpbin.org/get");
+    bool caseInsensitive = false;
+
+    try {
+        std::string& lowerDate = res.headers.at("date");
+        std::string& upperDate = res.headers.at("Date");
+        caseInsensitive = (lowerDate == upperDate);
+    } catch (std::out_of_range&) {
+        caseInsensitive = false;
+    }
+
+    EXPECT_TRUE(caseInsensitive) << "Headers should be case-insensitive but were not.";
+}
+
+TEST_F(RestClientTest, TestHeaderContentTypeCaseInsensitivity)
+{
+    RestClient::Response res = RestClient::get("https://httpbin.org/get");
+    bool caseInsensitive = false;
+
+    try {
+        std::string& lowerContentType = res.headers.at("content-type");
+        std::string& upperContentType = res.headers.at("Content-Type");
+        caseInsensitive = (lowerContentType == upperContentType);
+    } catch (std::out_of_range&) {
+        caseInsensitive = false;
+    }
+
+    EXPECT_TRUE(caseInsensitive) << "Content-Type header should be case-insensitive but was not.";
+}
